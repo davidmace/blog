@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Practical Bots
-date: 2016-07-12 15:46
+date: 2017-02-02 15:46
 comments: true
 external-url:
 categories: Everything
@@ -11,10 +11,17 @@ categories: Everything
 
 # 0. Goals
 
-The goal of this minibook is to teach a software engineer how to build a production-grade semi-automated natual language bot. This framework produces highly accurate responses (~95% accuracy on reasonable data), is not language-specific (ie. English, French, Japanese, etc), improves automatic response rate over time with more data, is flexible to a large variety of domains, and creates highly interpretable models. I include code for all of the components you'll need to create a basic bot so you can pick and choose which ones you need for your specific task.
+The goal of this minibook is to teach a software engineer how to build a production-grade semi-automated natual language bot. This objectives of this framework are :
 
-I assume basic knowledge of services and high-level machine learning concepts (ie. training set, feature space). You won't need to know any of the math behind the machine learning models. There is no math in this tutorial. Only code and concepts.
+1. produce highly accurate responses (~95% accuracy on most of my datasets from companies)
+2. not be language-specific (ie. English, French, Japanese, etc)
+3. improve automatic response rate over time with more data
+4. be flexible to a large variety of domains and dataset sizes
+5. create highly interpretable models
 
+I include code for all of the components you'll need to create a basic bot. You can pick and choose which ones to use for your specific task.
+
+I assume basic knowledge of services and high-level machine learning concepts (ie. training sets, model features). You won't need to know any of the math behind the machine learning models. There is no math in this tutorial. Only code and concepts.
 
 
 # I. Understanding the Problem and Data
@@ -23,7 +30,13 @@ I assume basic knowledge of services and high-level machine learning concepts (i
 
 A bot provides semi-automatic responses to a user's text requests. Except in very simple cases, natural language processing technology is not yet good enough to answer 100% of user requests. This is why bot engines, including our framework below, often leverage human responders for a portion of hard tasks.
 
-Our bot engine works by 1. converting a user's input text into a structured format, 2. calling APIs to get and update background variables, and 3. responding with a filled-in template. First look at the examples below then we'll break this down in more depth in the next section.
+Our bot engine works by 
+
+1. converting a user's input text into a structured format
+2. calling APIs to get and update background variables 
+3. responding with a filled-in template. 
+
+First look at the examples below then in the next section we'll break this down in more depth.
 
 ### Example 1<br>
 **User:** Find me a place to buy a Boston Terrier near Boston.<br>
@@ -47,25 +60,25 @@ Our bot engine works by 1. converting a user's input text into a structured form
 There are five major components of our engine.
 
 ### 1. Parameter Extraction
-In the examples above, "Boston", "Boston Terrier", and "Kindle" are parameters. They are specific values that we need to pass to our API calls. Before the word correction phase (step 2), we extract regex entities (emails, urls, phone numbers, numbers, and datetimes) and proper nouns (names and locations). We still need to correct the spelling of custom entities before extracting them, so we wait until step 3 to do this.
+In the examples above, "Boston", "Boston Terrier", and "Kindle" are parameters. They are specific values that we need to pass to our API calls. Before the word correction phase (step 2), we extract known entity types (emails, urls, phone numbers, numbers, and datetimes) and proper nouns (names and locations). We still need to correct the spelling of custom entities before extracting them, so we wait until step 3 to do this.
 
 ### 2. Word Correction
-Users often misspell words and use colloquial language (ie. ty, plz, k). It's important that we correct these errors before our algorithm attempts to understand the syntax and extract custom class parameters (ie. colors, burger toppings).
+Users often misspell words and use colloquial language (ie. ty, plz, k). It's important to correct these errors before our algorithm attempts to understand the input's syntax and extract custom class parameters (ie. colors, burger toppings).
 
 ### 3. Custom Parameter Extraction
-Often a bot needs to recognize custom classes: for example color parameters (ie. red, green, purple) or room prices. This section details a simple architecture for writing and managing these custom entity lists. I also walk through a clever technique to efficiently spellcheck massive (10k-1m length) lists of custom entities (ie. hotel names, book titles, rock bands).
+Often a bot needs to recognize custom classes. Examples include color parameters (ie. red, green, purple) and room prices. This section details a simple architecture for writing and managing these custom entity lists. I also walk through a clever technique for efficiently spellchecking massive (10k-1m length) lists of custom entities (ie. hotel names, book titles, rock bands).
 
 ### 4. Text Classification
 Each of the user's inputs corresponds to a function call with parameters. In the examples above, the function calls include local_lookup, is_open, and arrival_date. Assuming we have N preset function calls, we need to classify the function call of each new user input. This is very difficult. Syntax and word choice vary tremendously between different user inputs corresponding to single function call (ie. hi, good morning, warm regards). We use human labellers to label the function call of any input for which our algorithm returns low certainty in its answer.
 
 ### 5. State Management
-Requests often depend on previous information in the conversation. Parameters are passed between function calls. In this section, I detail a technique for managing this state information. This is definitely the most open-ended and application-specific section. Unlike with the components above, you may have to fiddle with these techniques to get them working on your use case.
+Requests often depend on previous information in the conversation. Parameters are passed between function calls. In this section, I detail a technique for managing this state information. This is definitely the most open-ended and application-specific section. Unlike in the components above, you may have to fiddle with these techniques to get them working on your use case.
 
 ## C. Data You Expect vs Data You Get
 
 As a developer, you know it's hard to predict how users will interact with your UI. Natural language inputs have many more degrees of freedom than traditional UI inputs (ie. click, scroll, etc). It's extremely difficult to wrap your head around the types and complexity of your user's requests without actually digging into the data.
 
-Your data will surely present its own challenges, but below are a few real-world examples of common complexities your bots will have to resolve.
+Your data will surely present its own challenges, but below are a few real-world examples of common complexities your bot must resolve.
 
 ### Example 1: Spelling and Grammar
 **My Expected Input:** I would like to send apples Monday night after 3pm.<br>
@@ -90,7 +103,7 @@ Your data will surely present its own challenges, but below are a few real-world
 ### Example 5: Complexity++
 **My Expected Input:** How does my son sign up for your school's classes?<br>
 **User Input:** My son is a student at Ohio State. He is a rising senior. I would like to enroll him in summer courses at your institution. Does he just sign up online, or should he go to an info session, or do I need to chat further with you?<br>
-**Analysis:** You might be able to answer really long and complex inputs with a stock answer. However, you're probably better off guiding your users to enter concise and direct inputs rather than trying to improve your technical solution. 
+**Analysis:** You might be able to answer really long and complex inputs with a stock answer. However, you're probably better off guiding your users to enter concise and direct inputs rather than trying to improve your technical solution.
 
 ### Example 6: Answers Requiring Reasoning
 **Previous Bot Output:** Are you an employee of the company or a prospect?<br>
@@ -325,6 +338,7 @@ Here are a few rulesets (English, Mandarin, French):
 > <i class="fa fa-cloud-download"></i>&nbsp;&nbsp; <a href="https://github.com/davidmace/practicalbots">Rulesets</a>
 
 And here is a link to the number parsing code. It handles the language-specific number formats above and non-language-specific number formats (ie. 5.2k, 678).
+
 > <i class="fa fa-cloud-download"></i>&nbsp;&nbsp; The extract_numbers function of <a href="https://github.com/davidmace/practicalbots">bot_helpers.py</a> contains code for this task.
 
 <br>
@@ -459,7 +473,7 @@ Our goal on a dataset of 2000 samples is to automatically respond to 50% of user
 
 ## B. Data
 
-Throughout this section, we use a sample real-world dataset from an education provider to test our classifcation algorithm.
+Throughout this section, we use a sample real-world dataset from an education provider to test our classification algorithm.
 
 For this sample use case, humans manually responded to all user questions until we had 2000 samples. Then we manually grouped the user inputs into classes. Below is a fake but representative example for each class:
 
@@ -606,7 +620,9 @@ Our simple, highly interpretable model of choice is a decision tree.
 
 Above is part of the decision tree that we trained on our sample dataset. 
 
-TODO explain
+TODO explain decision trees
+
+TODO make sure to mention how features are fed into this model
 
 > <i class="fa fa-cloud-download"></i>&nbsp;&nbsp; The code is in the "Decision Tree" section of <a href="https://github.com/davidmace/practicalbots">bot_helpers.py</a>.
 
