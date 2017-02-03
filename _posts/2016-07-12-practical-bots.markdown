@@ -18,6 +18,7 @@ I assume basic knowledge of services and high-level machine learning concepts (i
 
 
 # I. Understanding the Problem and Data
+
 ## A. What is a Bot Engine?
 
 A bot provides semi-automatic responses to a user's text requests. Except in very simple cases, natural language processing technology is not yet good enough to answer 100% of user requests. This is why bot engines, including our framework below, often leverage human responders for a portion of hard tasks.
