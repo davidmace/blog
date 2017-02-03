@@ -11,7 +11,7 @@ categories: Everything
 
 # 0. Goals
 
-The goal of this minibook is to teach a software engineer how to build a production-grade semi-automated natual language bot. This objectives of this framework are :
+The goal of this minibook is to teach a software engineer how to build a production-grade semi-automated natual language bot. The objectives of this framework are to:
 
 1. produce highly accurate responses (~95% accuracy on most of my datasets from companies)
 2. not be language-specific (ie. English, French, Japanese, etc)
@@ -30,13 +30,13 @@ I assume basic knowledge of services and high-level machine learning concepts (i
 
 A bot provides semi-automatic responses to a user's text requests. Except in very simple cases, natural language processing technology is not yet good enough to answer 100% of user requests. This is why bot engines, including our framework below, often leverage human responders for a portion of hard tasks.
 
-Our bot engine works by 
+Our bot engine works by:
 
 1. converting a user's input text into a structured format
 2. calling APIs to get and update background variables 
 3. responding with a filled-in template. 
 
-First look at the examples below then in the next section we'll break this down in more depth.
+First look at the examples below then we'll break this down in more depth in the next section.
 
 ### Example 1<br>
 **User:** Find me a place to buy a Boston Terrier near Boston.<br>
