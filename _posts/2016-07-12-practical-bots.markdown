@@ -131,6 +131,7 @@ Let this be a reminder of the complexity of your users' inputs.
 Email extraction is easy because the format <kbd>x@y.z</kbd> rarely if ever picks up false positives.
 
 Here's the regex:
+
 ```
 \b[\w\.\-!#$%&\'*\+\/=\?\^_`{\|}~]+@[\w\.\-]+\.[\w\-]+\b
 ```
@@ -152,6 +153,7 @@ send @ 5pm.tomorrow, false
 ## B. URLs
 
 URL extraction is more complicated because we need to recognize all of the following formats:
+
 ```
 https://www.google.com
 www.google.com
@@ -162,6 +164,7 @@ google.xyz?s=i+like+turtles
 ```
   
 And we need to ignore the following formats:
+
 ```
 bye.done with trial
 I am at Google.come to the park.
@@ -171,6 +174,7 @@ user@google.com
 The best regex I’ve seen looks for the pattern <kbd>wx.yz</kbd> where w contains http(s):// and/or www , x contains valid characters for a domain name, y is in a list of valid domain endings, and z belongs to a set of valid characters for url parameters, port, etc.
 
 Here's that regex (make sure to run in case-insensitive mode):
+
 ```
 (?:https?\:\/\/)?[\w\-\.]+\.(?:'+'|'.join(top_level_domains)+')[\w\-\._~:/\?#\[\]@!\$&%\'\(\)\*\+,;=]*
 ```
@@ -178,6 +182,7 @@ Here's that regex (make sure to run in case-insensitive mode):
 > <i class="fa fa-cloud-download"></i>&nbsp;&nbsp; The extract_urls function of <a href="https://github.com/davidmace/practicalbots">bot_helpers.py</a> contains code for this task.
 
 And here's my list of common url endings that has 98% coverage:
+
 > <i class="fa fa-cloud-download"></i>&nbsp;&nbsp; [top-level-domains.txt](https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains)
 
 Be careful not to recognize emails (david@google.com) as urls (google.com). To solve this problem, first extract emails then check that extracted urls are not substrings of your extracted emails.
@@ -189,7 +194,9 @@ Be careful not to recognize emails (david@google.com) as urls (google.com). To s
 > Like emails, urls can contain unicode characters. For instance .рф is the top level domain for ~0.1% of websites. If internationalization is a big concern, the regex above works if you first convert your string to [Punycode](https://en.wikipedia.org/wiki/Punycode).
 
 ## C. Phone Numbers
+
 Phone number extraction is more complex than you might imagine. If we want to handle international numbers, we have to consider all of these cases and more :
+
 ```
 +12-555-555-5555
 555 555 5555
@@ -204,14 +211,17 @@ Phone number extraction is more complex than you might imagine. If we want to ha
 ```
 
 But not these:
+
 ```
 4500
 I have 100. 1000 are on the way
 I have between 100-1000 berries
 ```
+
 Without taking nearby words into account, it’s not possible to differentiate some phone numbers from normal numbers (ie. 5555555 or 100-1000). This is rare enough that I usually just mark any number with seven or more digits/dashes as a phone number.
 
 Here's the regex (make sure to run as case-insensitive):
+
 ```
 [\d\+\(][\s\-\d\+\(\)\/\.]{5,}[\s\.,]*(?:x|ext|extension)?[\s\.,\d]*[\d\)]
 ```
@@ -243,6 +253,7 @@ The files below specify written-out number parsing rules (ie. eighty two, 八十
 
 <br>
 <i class="icon-file"></i> **numbers-english.txt**
+
 ```
 N 0: zero
 N 1: one
@@ -286,6 +297,7 @@ L: and_a and
 
 <br>
 <i class="icon-file"></i> **numbers-mandarin.txt**
+
 ```
 N 0:零
 N 1:一
@@ -316,6 +328,7 @@ And here is a link to the number parsing code. It handles the language-specific 
 > <i class="fa fa-cloud-download"></i>&nbsp;&nbsp; The extract_numbers function of <a href="https://github.com/davidmace/practicalbots">bot_helpers.py</a> contains code for this task.
 
 <br>
+
 > <i class="fa fa-flag-o"></i>&nbsp;&nbsp; **Limitation:** The number parser cannot handle number formats where the base is on the left of the number (ie. 十分之三 is 3/10 but the first three characters specify the base 1/10 and the last character specifies the number 3). Also because the parser is language-agnostic, it will recognize numbers formats that aren't allowed in some languages (ie. two thousand twenty thirty three-> 2053). I have never seen this cause an issue in practice.
 
 
@@ -385,9 +398,11 @@ Below is a service wrapper for the hunspell open source library so you can acces
 Spelling correctors don't pick up on Internet slang like <kbd>thx->thanks</kbd> and <kbd>kk->okay</kbd>. For example we might want to respond "No problem" to any form of "thanks" "thks" "thx" "ty". If we had all the data in the world, our algorithm would learn to recognize each of these responses separately. However in most cases we will never see at least one of these forms of "thanks" in the training data. Because of this, we need to normalize the forms.
 
 Here is my list of English internet abbreviations and their full spellings:
+
 > <i class="fa fa-cloud-download"></i>&nbsp;&nbsp; <a href="https://github.com/davidmace/practicalbots">Colloquialism List</a>
 
 <br/>
+
 > <i class="fa fa-info-circle"></i>&nbsp;&nbsp; **Extra:** 
 I only extracted colloquialisms for English. To generate a colloquialism list for another language, here's a process that works well. Obtain a large amount (1M+ lines) of online conversation data. I used a day's worth of public Tweets. Eliminate every word that is present in a dictionary. Sort the remaining words by frequency. Manually go through the 500 words with highest frequency and extract all of the colloquial words in the list.
 
@@ -397,6 +412,7 @@ I only extracted colloquialisms for English. To generate a colloquialism list fo
 ## A. Simple Parameter Recognition
 
 What if you want to extract custom parameters? Here are some examples for grocery delivery.
+
 ```
 i want a bunch of bananas
 plz deliver two bags of naval oranges
@@ -508,6 +524,7 @@ It's important to remember that there are ~6-20 possible concepts in an average 
 ## E. Dependency Parse Bigrams
 
 Imagine the user says:
+
 > Can you give me the entire number?"
 
 The relevant piece of information in this sentence is "give_number". This pair is called a bigram.
@@ -598,9 +615,9 @@ Each time I build a new model on the training set, I manually look at the trees 
 
 
 
-> Improvements:
-1. **Trigrams:** Sometimes bigrams don't suffice to capture full relationships. An example is the relationship "not_existing_student". This problem is actually very rare.
-2. **Dependency Graph Transformations:** Sometimes dependency parsing doesn't extract ideal bigrams for feature generation. For example "I would like to run" -> i_would would_like like_run to_run. The most important feature is i_run. There are a few linguistic formats that consistently cause problems like this: i_need_to_verb, i_would_like_to_verb, i_want_to_verb, verb_prep_noun, etc. It might be beneficial to add some feature mapping logic, but I didn't because a core aim of this was to work on multiple languages.
+> Improvements:<br>
+1. **Trigrams:** Sometimes bigrams don't suffice to capture full relationships. An example is the relationship "not_existing_student". This problem is actually very rare.<br>
+2. **Dependency Graph Transformations:** Sometimes dependency parsing doesn't extract ideal bigrams for feature generation. For example "I would like to run" -> i_would would_like like_run to_run. The most important feature is i_run. There are a few linguistic formats that consistently cause problems like this: i_need_to_verb, i_would_like_to_verb, i_want_to_verb, verb_prep_noun, etc. It might be beneficial to add some feature mapping logic, but I didn't because a core aim of this was to work on multiple languages.<br>
 3. **Synonym Combination:** This is the biggest area of improvement for the current algorithm. Reducing the number of unique words our algorithm needs to learn will allow it to properly recognize rare diction.
 
 
