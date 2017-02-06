@@ -3,10 +3,6 @@ title: "Minibooks"
 author: "David Mace"
 description: ""
 keywords: "asdgfkgasdkhfgalkjsdhfjlk"
-
-baseurl: ""
-url: "http://hugosereno.eu"
-
 simple_search: http://google.com/search
 markdown: kramdown
 highlighter: rouge
