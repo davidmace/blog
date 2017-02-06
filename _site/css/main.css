@@ -22,17 +22,6 @@ body {
     color: #c72323; }
   body p {
     line-height: 2; }
-  body article > :first-child {
-    min-height: 4em; }
-    body article > :first-child:first-letter {
-      color: #ad1f1f;
-      display: inline-block;
-      float: left;
-      font-size: 3.2em;
-      line-height: 0.7em;
-      font-style: normal;
-      font-weight: bold;
-      margin: 0.12em 0.15em 0 -0.01em; }
   body h1 {
     font-weight: 600; }
   body h2 {

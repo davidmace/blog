@@ -7,21 +7,22 @@ external-url:
 categories: Everything
 ---
 
-.
-
 # 0. Goals
 
 The goal of this minibook is to teach a software engineer how to build a production-grade semi-automated natual language bot. The objectives of this framework are to:
 
-1. produce highly accurate responses (~95% accuracy on most of my datasets from companies)
-2. not be language-specific (ie. English, French, Japanese, etc)
+1. produce highly accurate responses (~95% accuracy on most of my datasets from clients)
+2. be as non-language-specific as possible (ie. English, French, Chinese, etc)
 3. improve automatic response rate over time with more data
 4. be flexible to a large variety of domains and dataset sizes
 5. create highly interpretable models
+6. strongly prefer existing open source components and cloud services to our own implementations (full impementation is <600 lines of code, mostly consisting of service wrappers)
 
-I include code for all of the components you'll need to create a basic bot. You can pick and choose which ones to use for your specific task.
+I include code for all of the components you'll need to create a basic bot. You can pick and choose what you need for your specific task.
 
-I assume basic knowledge of services and high-level machine learning concepts (ie. training sets, model features). You won't need to know any of the math behind the machine learning models. There is no math in this tutorial. Only code and concepts.
+I assume basic knowledge of services and high-level machine learning concepts (ie. training vs test sets, sparse vs dense feature vectors). You won't need to know any of the math behind the machine learning models. There is no math in this tutorial. Only code and concepts.
+
+In the course of my work for clients over the past year, I've tested a considerable variety of frameworks for operating bots and libraries for filling bot components. Part of my objective in writing this is to save other people the time it took me to weed through the noise. The resulting system is very simple but surprisingly effective.
 
 
 # I. Understanding the Problem and Data
@@ -360,8 +361,6 @@ tomorrow at half past noon
 
 Wit.AI’s Duckling has the highest accuracy of any library I've seen. It supports English, Spanish, French, Italian, and Chinese, which together cover 67% of online spoken language. More importantly it's written in a way (probabilistic models) that makes it easily extensible to further languages.
 
-Duckling additionally offers number, email, url, etc parsing; however, I’ve found regex parsers to work better on all entities except time (as of Sept 2016). 
-
 Duckling is written in clojure so I wrapped it in a simple service. Duckling does a non-negligible amount of work so you'll probably want to easily scale it up/down later (which is easiest if it's a separate service). 
 
 > <i class="fa fa-cloud-download"></i>&nbsp;&nbsp; <a href="https://github.com/davidmace/practicalbots">Duckling Wrapper</a>
@@ -614,19 +613,30 @@ Because we wanted this framework to work on both small and large datasests, most
 
 Our simple, highly interpretable model of choice is a decision tree.
 
+After the dependency parsing and additional feature extraction, each input has been transformed into a list of features like this:
+
+```
+'He kicks the ball on Wedensday.' ->
+[he_kick, kick_ball, the_ball, kick_on, on_ENT/TIME, SHORT, he, kick, the, ball, on, ENT/TIME]
+```
+
+These feature vectors use a sparse format. In our case, sparse vectors are faster to process. Python's sklearn decision tree can accept sparse vectors.
+
+Below is an example of a decision tree.
+
 {:refdef: style="text-align: center;"}
-<img src="/assets/decision-tree.png"/>
+<img src="/assets/decision_tree.png"/>
 {: refdef}
 
-Above is part of the decision tree that we trained on our sample dataset. 
+A decision tree works as follows. Start at the top square box. If that feature is present in the input, move along the 'yes' path. Otherwise move along the 'no' path. Continue this process until you reach a leaf (circle box). This is the class predicted for the input. 
 
-TODO explain decision trees
+During the training phase, the decision tree classifier makes a decision tree that accurately classifies our training data. The details of this process are unimportant for our overview; however, if you're curious, look up 'decision tree + gini impurity'. Because we limit the number of leaves in our tree, most leaves will represent a probability distribution across all classes rather than a 100% classification for a single class.
 
-TODO make sure to mention how features are fed into this model
+Decision trees are good at properly separating knotted data. For instance in our example, 'no thanks' has the features 'no' and 'thank' so 'no' needs to be a stronger feature than 'thank'. Even if we rarely see this example in our training set, a decision tree will learn to accurately unknot it. Other algorithms are equally capable, but it's easier to visualize model issues with decision trees.
 
 > <i class="fa fa-cloud-download"></i>&nbsp;&nbsp; The code is in the "Decision Tree" section of <a href="https://github.com/davidmace/practicalbots">bot_helpers.py</a>.
 
-Each time I build a new model on the training set, I manually look at the trees generated from 3-4 tree sizes. Then you can get a sense of which ones have too few features or too many noise features. You could just choose the model with the best test set performance, but it's nice to have a sense of how your model is developing as it consumes more data.
+Each time I build a new model on the training set, I manually look at the trees generated from ~3 tree sizes. Then you can get a sense of which ones have too few features or too many noise features. You could just choose the model with the best test set performance, but it's nice to have a sense of how your model is developing as it consumes more data.
 
 
 
