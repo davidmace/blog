@@ -11,7 +11,7 @@ categories: Everything
 
 The goal of this minibook is to teach a software engineer how to build a production-grade semi-automated natual language bot. The objectives of this framework are to:
 
-1. produce highly accurate responses (~95% accuracy on most of my datasets from clients)
+1. produce highly accurate responses (~95% algorithm + human combined accuracy on most of my datasets from clients)
 2. be as non-language-specific as possible (ie. English, French, Chinese, etc)
 3. improve automatic response rate over time with more data
 4. be flexible to a large variety of domains and dataset sizes
@@ -468,7 +468,7 @@ The algorithm works by the following logic.
 
 Text classification is by far the hardest task you'll face when making a bot. For all of the real-world use cases I've seen (sales, customer support, education, insurance, health, news, etc), responding with an incorrect answer is really really bad. Current technology, no matter how hyped, isn't good enough to obtain high accuracy on everything your users will ask. Therefore, our goal is to design a system that can accurately identify what it knows how to answer, pass everything else to a human, and progressively learn from the human answers.
 
-Our goal on a dataset of 2000 samples is to automatically respond to 50% of user inputs with 95% accuracy. The same classification algorithm could probably obtain 70-80% accuracy if we let it respond to all questions, but the 20% of inputs we get wrong will really piss off your customers. As you obtain more data, you should expect to automatically answer more questions while maintaining this consistent 95% accuracy.
+Our goal on a dataset of 2000 samples is to automatically respond to 50% of user inputs with 93% accuracy. Assuming human responses are 97% accurate, the user will see ~95% accurate responses in total. The same classification algorithm could probably obtain 70-80% accuracy if we let it respond to all questions, but the 20% of inputs we get wrong will really piss off your customers. As you obtain more data, you should expect to automatically answer more questions while maintaining this consistent 95% accuracy.
 
 ## B. Data
 
